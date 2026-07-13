@@ -6,6 +6,7 @@ dist/
 # content pulled from the learnerstate/lsl repo at build time — never vendored,
 # see scripts/fetch-spec.mjs and README.md
 src/content/spec-generated/
+src/content/intro-generated/
 src/content/examples-generated/
 
 # dependencies

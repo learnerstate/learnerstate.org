@@ -1,0 +1,228 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const [introEntry] = await getCollection("intro");
+
+if (!introEntry) {
+  throw new Error("Intro content missing. Run `npm run fetch:spec` before building or developing.");
+}
+
+const { Content } = await render(introEntry);
+const fetchedDate = introEntry.data.fetchedAt
+  ? new Date(introEntry.data.fetchedAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    })
+  : null;
+---
+
+<BaseLayout
+  title="LSL Intro · Learner State Layer"
+  description="Plain-language explainer for Learner State Layer: what it solves, what it looks like, and how adoption works."
+  bodyClass="intro-page"
+>
+  <div class="intro-intro">
+    <section class="intro-hero">
+      <div class="intro-copy">
+        <p class="label">Intro</p>
+        <h1>LSL, explained simply.</h1>
+        <p class="intro-lead">
+          A small, open file format for describing what a person currently knows, in language that
+          people and AI systems can both use.
+        </p>
+        <div class="intro-meta">
+          <span class="badge badge-accent">Plain-language explainer</span>
+          {fetchedDate && <span class="intro-date">Updated {fetchedDate}</span>}
+        </div>
+      </div>
+
+      <div class="intro-summary">
+        <div class="summary-row">
+          <span class="summary-key">Problem</span>
+          <span class="summary-value">learner knowledge stays trapped in separate systems</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Shape</span>
+          <span class="summary-value">compact, readable, and sentence-first</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Use</span>
+          <span class="summary-value">AI tutors, adaptive products, and portable learner context</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="intro-rendering">
+    <article class="prose intro-content">
+      <div class="intro-content-head">
+        <a
+          class="src-link"
+          href="https://github.com/learnerstate/lsl/blob/main/README.md"
+          target="_blank"
+          rel="noopener"
+        >
+          View source on GitHub
+        </a>
+      </div>
+      <Content />
+    </article>
+  </section>
+</BaseLayout>
+
+<style>
+  .intro-intro {
+    width: min(68rem, calc(100vw - 3rem));
+    margin-inline: auto;
+  }
+
+  .intro-hero {
+    display: grid;
+    gap: 1rem;
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .intro-copy {
+    max-width: 42rem;
+  }
+
+  .intro-copy h1 {
+    margin-top: 0.35rem;
+    margin-bottom: 0.85rem;
+    max-width: 12ch;
+  }
+
+  .intro-lead {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--fg-secondary);
+    font-size: 1.02rem;
+    line-height: 1.7;
+  }
+
+  .intro-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+  }
+
+  .intro-date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .intro-summary {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .summary-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(31, 29, 26, 0.08);
+  }
+
+  .summary-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .summary-key {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .summary-value {
+    color: var(--fg);
+    text-align: right;
+  }
+
+  .intro-rendering {
+    width: min(76rem, calc(100vw - 3rem));
+    margin-inline: auto;
+    padding: 2rem 0 4.5rem;
+  }
+
+  .intro-content {
+    max-width: 68rem;
+    margin-inline: auto;
+    padding: 1.4rem;
+  }
+
+  .intro-content-head {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .src-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--fg-secondary);
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  .src-link:hover {
+    color: var(--fg);
+    background: var(--bg-elevated);
+    border-color: var(--border-strong);
+    text-decoration: none;
+  }
+
+  .intro-content :global(h1) {
+    margin-top: 0;
+  }
+
+  .intro-content :global(h2) {
+    margin-top: 1.6rem;
+  }
+
+  .intro-content :global(pre.astro-code) {
+    margin: 1.2rem 0;
+  }
+
+  @media (min-width: 900px) {
+    :global(body.intro-page main.wrap) {
+      max-width: none;
+      padding-inline: 0;
+    }
+
+    .intro-hero {
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      align-items: start;
+      gap: 1.5rem;
+      padding-top: 4rem;
+    }
+
+    .intro-rendering {
+      width: min(86rem, calc(100vw - 4rem));
+      padding-top: 2rem;
+    }
+  }
+</style>

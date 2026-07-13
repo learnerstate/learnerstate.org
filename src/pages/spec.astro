@@ -29,53 +29,57 @@ const fetchedDate = specEntry.data.fetchedAt
   description="The core specification for Learner State Layer: a portable snapshot of what a person knows."
   bodyClass="spec-page"
 >
-  <section class="spec-hero">
-    <div class="spec-copy">
-      <p class="label">Specification</p>
-      <h1>Portable learner state, defined clearly.</h1>
-      <p class="spec-lead">
-        LSL is a compact, portable snapshot of what a learner knows now, what they still need to
-        work on, and how confident each claim is.
-      </p>
-      <div class="spec-meta">
-        <span class="badge">v1.0-draft</span>
-        {fetchedDate && <span class="spec-date">Updated {fetchedDate}</span>}
+  <div class="spec-intro">
+    <section class="spec-hero">
+      <div class="spec-copy">
+        <p class="label">Specification</p>
+        <h1>Portable learner state, defined clearly.</h1>
+        <p class="spec-lead">
+          LSL is a compact, portable snapshot of what a learner knows now, what they still need to
+          work on, and how confident each claim is.
+        </p>
+        <div class="spec-meta">
+          <span class="badge">v1.0-draft</span>
+          {fetchedDate && <span class="spec-date">Updated {fetchedDate}</span>}
+        </div>
       </div>
-    </div>
 
-    <div class="spec-summary">
-      <div class="summary-row">
-        <span class="summary-key">Core</span>
-        <span class="summary-value">concepts, mastery, confidence, freshness</span>
+      <div class="spec-summary">
+        <div class="summary-row">
+          <span class="summary-key">Core</span>
+          <span class="summary-value">concepts, mastery, confidence, freshness</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Core signals</span>
+          <span class="summary-value">can, cannot_yet, misconceptions, next</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Extensions</span>
+          <span class="summary-value">provenance, relationships, federation</span>
+        </div>
       </div>
-      <div class="summary-row">
-        <span class="summary-key">Core signals</span>
-        <span class="summary-value">can, cannot_yet, misconceptions, next</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-key">Extensions</span>
-        <span class="summary-value">provenance, relationships, federation</span>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <section class="spec-shell">
-    <aside class="spec-sidebar">
-      <Toc headings={headings} />
-    </aside>
-    <article class="prose spec-content">
-      <div class="spec-content-head">
-        <a
-          class="src-link"
-          href="https://github.com/learnerstate/lsl/blob/main/SPEC.md"
-          target="_blank"
-          rel="noopener"
-        >
-          View source on GitHub
-        </a>
-      </div>
-      <Content />
-    </article>
+  <section class="spec-rendering" aria-labelledby="spec-rendering-title">
+    <div class="spec-shell">
+      <aside class="spec-sidebar">
+        <Toc headings={headings} />
+      </aside>
+      <article class="prose spec-content">
+        <div class="spec-content-head">
+          <a
+            class="src-link"
+            href="https://github.com/learnerstate/lsl/blob/main/SPEC.md"
+            target="_blank"
+            rel="noopener"
+          >
+            View source on GitHub
+          </a>
+        </div>
+        <Content />
+      </article>
+    </div>
   </section>
 </BaseLayout>
 
@@ -87,6 +91,11 @@ const fetchedDate = specEntry.data.fetchedAt
     gap: 1rem;
     padding: 3rem 0 2rem;
     border-bottom: 1px solid var(--border);
+  }
+
+  .spec-intro {
+    width: min(68rem, calc(100vw - 3rem));
+    margin-inline: auto;
   }
 
   .spec-copy {
@@ -163,7 +172,31 @@ const fetchedDate = specEntry.data.fetchedAt
   .spec-shell {
     display: grid;
     gap: 1.5rem;
-    padding: 2rem 0 4.5rem;
+    padding: 0 0 4.5rem;
+    width: min(96rem, calc(100vw - 3rem));
+    margin-inline: auto;
+  }
+
+  .spec-rendering {
+    position: relative;
+    width: min(96rem, calc(100vw - 3rem));
+    margin-inline: auto;
+    margin-top: 1rem;
+    padding: 1.5rem 0 0;
+  }
+
+  .spec-rendering-head {
+    display: grid;
+    gap: 0.4rem;
+    width: min(68rem, calc(100vw - 3rem));
+    margin-inline: auto;
+    padding: 0 0 1rem;
+  }
+
+  .spec-rendering-head h2 {
+    margin: 0;
+    max-width: 18ch;
+    font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2rem);
   }
 
   .spec-content-head {
@@ -197,7 +230,7 @@ const fetchedDate = specEntry.data.fetchedAt
   }
 
   .spec-content {
-    max-width: 62rem;
+    max-width: none;
   }
 
   .spec-content :global(pre.astro-code) {
@@ -216,32 +249,39 @@ const fetchedDate = specEntry.data.fetchedAt
   }
 
   @media (min-width: 900px) {
-    :global(body.spec-page .wrap) {
-      max-width: 84rem;
-    }
-
-    :global(body.spec-page .spec-content.prose) {
-      max-width: 62rem;
+    :global(body.spec-page main.wrap) {
+      max-width: none;
+      padding-inline: 0;
     }
 
     .spec-hero {
-      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
       align-items: start;
-      gap: 1.75rem;
+      gap: 1.5rem;
       padding-top: 4rem;
     }
 
+    .spec-rendering {
+      width: min(98rem, calc(100vw - 4rem));
+      padding-top: 2rem;
+    }
+
     .spec-shell {
-      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-columns: 300px minmax(0, 1fr);
       align-items: start;
-      gap: 2rem;
+      gap: 2.75rem;
     }
 
     .spec-sidebar {
       position: sticky;
       top: calc(3.5rem + 1rem);
-      max-height: calc(100vh - 4.5rem);
+      max-height: calc(100vh - 5rem);
       overflow-y: auto;
+      padding-inline-end: 0.25rem;
+    }
+
+    .spec-content {
+      max-width: 68rem;
     }
   }
 </style>

@@ -1,12 +1,15 @@
 ---
 const navItems = [
+  { href: "/intro", label: "Intro" },
   { href: "/spec", label: "Spec" },
   { href: "/examples", label: "Examples" },
 ];
 const currentPath = Astro.url.pathname;
 
 let pageName = "";
-if (currentPath.startsWith("/spec")) {
+if (currentPath.startsWith("/intro")) {
+  pageName = "Intro";
+} else if (currentPath.startsWith("/spec")) {
   pageName = "Spec";
 } else if (currentPath.startsWith("/examples")) {
   pageName = "Examples";

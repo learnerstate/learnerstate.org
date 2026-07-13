@@ -9,7 +9,6 @@
 //      (LSL_REF defaults to "main"). Used in CI / production builds.
 
 import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -17,6 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
 const SPEC_OUT_DIR = path.join(root, "src/content/spec-generated");
+const INTRO_OUT_DIR = path.join(root, "src/content/intro-generated");
 const EXAMPLES_OUT_DIR = path.join(root, "src/content/examples-generated");
 
 const LSL_REF = process.env.LSL_REF ?? "main";
@@ -24,6 +24,7 @@ const REMOTE_BASE = `https://raw.githubusercontent.com/learnerstate/lsl/${LSL_RE
 const LOCAL_PATH = process.env.LSL_LOCAL_PATH ?? null;
 
 const FILES = {
+  intro: "README.md",
   spec: "SPEC.md",
   examples: [
     "examples/README.md",
@@ -62,13 +63,22 @@ async function main() {
   console.log(`[fetch-spec] pulling from ${source}`);
 
   await rm(SPEC_OUT_DIR, { recursive: true, force: true });
+  await rm(INTRO_OUT_DIR, { recursive: true, force: true });
   await rm(EXAMPLES_OUT_DIR, { recursive: true, force: true });
   await mkdir(SPEC_OUT_DIR, { recursive: true });
+  await mkdir(INTRO_OUT_DIR, { recursive: true });
   await mkdir(EXAMPLES_OUT_DIR, { recursive: true });
+  const fetchedAt = new Date().toISOString();
+
+  // --- README.md -> intro content-collection entry with generated frontmatter ---
+  const introRaw = await getContent(FILES.intro);
+  const introDoc =
+    frontmatter({ title: "LSL Explainer", source, fetchedAt }) + introRaw;
+  await writeFile(path.join(INTRO_OUT_DIR, "readme.md"), introDoc, "utf-8");
+  console.log(`[fetch-spec] wrote README.md (${introRaw.length} bytes)`);
 
   // --- SPEC.md -> a content-collection entry with generated frontmatter ---
   const specRaw = await getContent(FILES.spec);
-  const fetchedAt = new Date().toISOString();
   const specDoc =
     frontmatter({ title: "LSL Specification", source, fetchedAt }) + specRaw;
   await writeFile(path.join(SPEC_OUT_DIR, "spec.md"), specDoc, "utf-8");
