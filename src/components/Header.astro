@@ -1,0 +1,310 @@
+---
+const navItems = [
+  { href: "/spec", label: "Spec" },
+  { href: "/examples", label: "Examples" },
+];
+const currentPath = Astro.url.pathname;
+
+let pageName = "";
+if (currentPath.startsWith("/spec")) {
+  pageName = "Spec";
+} else if (currentPath.startsWith("/examples")) {
+  pageName = "Examples";
+}
+---
+
+<header class="site-header" id="site-header">
+  <span id="header-sentinel" aria-hidden="true"></span>
+  <div class="wrap header-inner">
+    <div class="header-breadcrumbs">
+      <a href="/" class="wordmark" aria-label="Learner State Layer home">
+        <img class="wordmark-mark" src="/logo.svg" alt="" aria-hidden="true" />
+        <span class="wordmark-text">Learner State Layer</span>
+      </a>
+      {pageName && (
+        <>
+          <span class="breadcrumb-sep" aria-hidden="true">/</span>
+          <div class="breadcrumb-page">
+            <span class="breadcrumb-text">{pageName}</span>
+          </div>
+        </>
+      )}
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" type="button">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+
+    <nav aria-label="Primary" id="primary-nav">
+      <ul>
+        {
+          navItems.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[{ active: currentPath.startsWith(item.href) }]}
+                aria-current={currentPath.startsWith(item.href) ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a
+            href="https://github.com/learnerstate"
+            target="_blank"
+            rel="noopener"
+            class="nav-github"
+            aria-label="GitHub repository"
+          >
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById("site-header")!;
+  const sentinel = document.getElementById("header-sentinel")!;
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      header.classList.toggle("is-scrolled", !entry.isIntersecting);
+    },
+    { threshold: 0 },
+  );
+  observer.observe(sentinel);
+
+  const hamburger = document.getElementById("hamburger")!;
+  const nav = document.getElementById("primary-nav")!;
+  hamburger.addEventListener("click", () => {
+    const expanded = hamburger.getAttribute("aria-expanded") === "true";
+    hamburger.setAttribute("aria-expanded", String(!expanded));
+    nav.classList.toggle("is-open");
+    document.body.classList.toggle("nav-open");
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(247, 245, 240, 0.84);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(31, 29, 26, 0.08);
+    transition: box-shadow 200ms ease, background-color 200ms ease;
+  }
+
+  .site-header.is-scrolled {
+    box-shadow: 0 1px 0 rgba(31, 29, 26, 0.08);
+    background: rgba(247, 245, 240, 0.92);
+  }
+
+  #header-sentinel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    gap: 1rem;
+  }
+
+  .header-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.875rem;
+    min-width: 0;
+  }
+
+  .breadcrumb-sep {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 0.875rem;
+  }
+
+  .breadcrumb-page {
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .breadcrumb-text {
+    font-size: 0.875rem;
+  }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    color: var(--fg);
+    flex-shrink: 0;
+    padding: 0.3rem 0.15rem;
+    border-radius: var(--radius-sm);
+    transition: color 150ms ease, opacity 150ms ease;
+  }
+
+  .wordmark-mark {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    display: block;
+  }
+
+  .wordmark:hover {
+    text-decoration: none;
+    opacity: 0.8;
+  }
+
+  .wordmark-text {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--fg);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    z-index: 60;
+  }
+
+  .hamburger-bar {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--fg);
+    border-radius: 1px;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+
+  .hamburger[aria-expanded="true"] .hamburger-bar:first-child {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+
+  .hamburger[aria-expanded="true"] .hamburger-bar:last-child {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
+
+  nav ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--fg-secondary);
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  nav a:hover {
+    background: rgba(31, 29, 26, 0.05);
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  nav a.active {
+    color: var(--fg);
+    background: rgba(31, 29, 26, 0.06);
+  }
+
+  .nav-sep {
+    display: none;
+  }
+
+  .nav-github {
+    color: var(--muted) !important;
+  }
+
+  .nav-github:hover {
+    color: var(--fg) !important;
+  }
+
+  @media (max-width: 768px) {
+    .hamburger {
+      display: flex;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(78vw, 280px);
+      height: 100vh;
+      background: var(--bg-elevated);
+      border-left: 1px solid var(--border);
+      padding: 5rem 1.5rem 2rem;
+      transform: translateX(100%);
+      transition: transform 250ms ease;
+      z-index: 55;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    nav.is-open {
+      transform: translateX(0);
+    }
+
+    body.nav-open::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 18, 18, 0.3);
+      z-index: 54;
+    }
+
+    nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.35rem;
+    }
+
+    nav a {
+      padding: 0.7rem 0.8rem;
+      font-size: 1rem;
+      border-radius: 12px;
+    }
+
+    .nav-sep {
+      display: none;
+    }
+
+    .wordmark-text {
+      letter-spacing: -0.02em;
+    }
+  }
+</style>

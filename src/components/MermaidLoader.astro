@@ -1,0 +1,28 @@
+---
+// Only include this component on pages where remark-mermaid-blocks.mjs
+// emitted a <pre class="mermaid">. See the spec page for the detection.
+// Ships mermaid.js to the client on that page only.
+---
+
+<script>
+  import mermaid from "mermaid";
+
+  mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+
+  const blocks = document.querySelectorAll<HTMLElement>("pre.mermaid");
+  blocks.forEach(async (block, i) => {
+    const graphDefinition = block.textContent ?? "";
+    const { svg } = await mermaid.render(`mermaid-${i}`, graphDefinition);
+    block.outerHTML = `<div class="mermaid-diagram">${svg}</div>`;
+  });
+</script>
+
+<style is:global>
+  .mermaid-diagram {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+  }
+</style>

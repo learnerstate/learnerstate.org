@@ -1,0 +1,23 @@
+{
+  "name": "learnerstate.org",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "fetch:spec": "node scripts/fetch-spec.mjs",
+    "predev": "npm run fetch:spec",
+    "dev": "astro dev",
+    "prebuild": "npm run fetch:spec",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.2.1",
+    "astro": "^7.0.7",
+    "mermaid": "^11.16.0",
+    "unist-util-visit": "^5.1.0"
+  }
+}

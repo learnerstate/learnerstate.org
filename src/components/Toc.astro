@@ -1,0 +1,181 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+// Keep it to two levels. A spec TOC that goes past ### stops being
+// navigable at a glance.
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<nav class="toc" aria-label="Table of contents">
+  <p class="toc-label">On this page</p>
+  <details class="toc-mobile">
+    <summary>Contents</summary>
+    <ul>
+      {
+        items.map((item) => (
+          <li class:list={[`depth-${item.depth}`]}>
+            <a href={`#${item.slug}`}>{item.text}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </details>
+  <ul class="toc-desktop">
+    {
+      items.map((item) => (
+        <li class:list={[`depth-${item.depth}`]}>
+          <a href={`#${item.slug}`} class="toc-link" data-slug={item.slug}>
+            {item.text}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  const links = document.querySelectorAll<HTMLAnchorElement>(".toc-link");
+  const slugMap = new Map<string, HTMLAnchorElement>();
+  links.forEach((l) => {
+    const slug = l.dataset.slug;
+    if (slug) slugMap.set(slug, l);
+  });
+
+  let active: HTMLAnchorElement | null = null;
+
+  function setActive(el: HTMLAnchorElement | null) {
+    if (active === el) return;
+    active?.removeAttribute("data-active");
+    active?.parentElement?.removeAttribute("data-active");
+    el?.setAttribute("data-active", "");
+    el?.parentElement?.setAttribute("data-active", "");
+    active = el;
+  }
+
+  const headingEls = Array.from(
+    document.querySelectorAll<HTMLElement>("article h2[id], article h3[id]")
+  );
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const el = slugMap.get(entry.target.id);
+          if (el) setActive(el);
+        }
+      }
+    },
+    { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+  );
+
+  headingEls.forEach((el) => observer.observe(el));
+</script>
+
+<style>
+  .toc {
+    font-size: 0.8rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 245, 239, 0.92));
+    box-shadow: var(--shadow-sm);
+  }
+
+  .toc-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.9rem;
+    display: none;
+  }
+
+  .toc-mobile {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0 0.85rem;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .toc-mobile summary {
+    cursor: pointer;
+    padding: 0.8rem 0;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--fg-secondary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .toc-mobile ul {
+    padding-bottom: 0.85rem;
+  }
+
+  .toc-desktop {
+    display: none;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin: 0;
+  }
+
+  .toc-link {
+    display: block;
+    padding: 0.45em 0.7em;
+    margin: 0.1rem 0;
+    border-radius: 999px;
+    color: var(--fg-secondary);
+    text-decoration: none;
+    line-height: 1.4;
+    transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+  }
+
+  .toc-link:hover {
+    background: var(--hover-bg);
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .toc-link[data-active] {
+    color: var(--accent);
+    background: var(--accent-subtle);
+    font-weight: 500;
+    transform: translateX(2px);
+  }
+
+  .depth-3 .toc-link {
+    padding-left: 1.35em;
+    font-size: 0.78rem;
+  }
+
+  @media (min-width: 900px) {
+    .toc-label {
+      display: block;
+    }
+
+    .toc-mobile {
+      display: none;
+    }
+
+    .toc-desktop {
+      display: grid;
+      gap: 0.2rem;
+    }
+  }
+</style>

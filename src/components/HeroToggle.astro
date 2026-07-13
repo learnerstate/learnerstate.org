@@ -1,0 +1,261 @@
+---
+import { Code } from "astro:components";
+
+const rawFiles = import.meta.glob("../content/examples-generated/*", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+
+function contentFor(name: string): string | undefined {
+  const match = Object.entries(rawFiles).find(([path]) => path.endsWith(`/${name}`));
+  return match?.[1];
+}
+
+const yaml = contentFor("minimal-core.yml");
+
+if (!yaml) {
+  throw new Error("Example content missing. Run `npm run fetch:spec` before building or developing.");
+}
+
+const minimalDocument = {
+  lsl: "1.0",
+  learner: "lrn-3f9qm",
+  updated: "2026-07-12",
+  concepts: [
+    {
+      name: "CSS Flexbox",
+      mastery: 0.55,
+      confidence: "low",
+      last_seen: "2026-07-10",
+      can: ["Centers items in a single-row container"],
+      cannot_yet: [],
+      misconceptions: [],
+    },
+  ],
+} as const;
+
+function daysBetween(later: string, earlier: string) {
+  const start = new Date(`${earlier}T00:00:00Z`).getTime();
+  const end = new Date(`${later}T00:00:00Z`).getTime();
+  return Math.max(0, Math.round((end - start) / 86_400_000));
+}
+
+function renderPrompt() {
+  const identity = `LEARNER: ${minimalDocument.learner} · updated ${minimalDocument.updated}`;
+  const mastery = minimalDocument.concepts
+    .map((concept) => {
+      const staleDays = daysBetween(minimalDocument.updated, concept.last_seen);
+      const stale = staleDays > 0 ? ` (stale ${staleDays}d)` : "";
+      return `${concept.name} ${concept.mastery.toFixed(2)} ${concept.confidence}${stale}`;
+    })
+    .join(" · ");
+  const can = minimalDocument.concepts.flatMap((concept) => concept.can).join(" · ");
+
+  return [identity, mastery ? `MASTERY: ${mastery}` : "", can ? `CAN: ${can}` : ""]
+    .filter(Boolean)
+    .join("\n");
+}
+
+const json = JSON.stringify(
+  minimalDocument,
+  null,
+  2,
+);
+
+const prompt = renderPrompt();
+
+const tabs = [
+  { id: "yaml", label: "YAML", lang: "yaml", code: yaml },
+  { id: "json", label: "JSON", lang: "json", code: json },
+  { id: "prompt", label: "PROMPT", lang: "text", code: prompt },
+] as const;
+---
+
+<div class="toggle-shell">
+  <div class="toggle-head">
+    <p class="toggle-label">Document preview</p>
+    <div class="toggle-row" role="tablist" aria-label="Document format">
+      {
+        tabs.map((tab, index) => (
+          <button
+            id={`toggle-${tab.id}`}
+            class:list={["toggle-btn", { "is-active": index === 0 }]}
+            type="button"
+            role="tab"
+            aria-selected={index === 0 ? "true" : "false"}
+            aria-controls={`panel-${tab.id}`}
+            tabindex={index === 0 ? "0" : "-1"}
+            data-tab={tab.id}
+          >
+            {tab.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="toggle-panels">
+    {
+      tabs.map((tab, index) => (
+        <div
+          id={`panel-${tab.id}`}
+          class:list={["panel", { "is-active": index === 0 }]}
+          role="tabpanel"
+          aria-labelledby={`toggle-${tab.id}`}
+          hidden={index !== 0}
+        >
+          {tab.id === "prompt" ? (
+            <pre class="prompt-block"><code>{tab.code}</code></pre>
+          ) : (
+            <Code code={tab.code} lang={tab.lang} theme="github-dark" />
+          )}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".toggle-btn"));
+  const panels = new Map(
+    Array.from(document.querySelectorAll<HTMLElement>(".panel")).map((panel) => [panel.id, panel]),
+  );
+
+  function activate(tabId: string) {
+    buttons.forEach((button) => {
+      const active = button.dataset.tab === tabId;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+      button.tabIndex = active ? 0 : -1;
+    });
+
+    panels.forEach((panel, id) => {
+      const active = id === `panel-${tabId}`;
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    });
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const tabId = button.dataset.tab;
+      if (tabId) activate(tabId);
+    });
+  });
+</script>
+
+<style>
+  .toggle-shell {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .toggle-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .toggle-label {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #aab7c7;
+  }
+
+  .toggle-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.2rem;
+    border: 1px solid rgba(125, 145, 173, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .toggle-btn {
+    border: 0;
+    background: transparent;
+    color: #8da0b5;
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .toggle-btn:hover:not(.is-active) {
+    color: #d8e0ea;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .toggle-btn.is-active {
+    background: #d8e0ea;
+    color: #101826;
+    box-shadow: 0 10px 22px rgba(18, 25, 37, 0.22);
+  }
+
+  .toggle-panels {
+    border: 1px solid rgba(125, 145, 173, 0.18);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(18, 25, 37, 0.98), rgba(12, 18, 28, 0.98));
+    overflow: hidden;
+    box-shadow: 0 24px 50px rgba(18, 25, 37, 0.18);
+  }
+
+  .panel {
+    padding: 0;
+  }
+
+  .panel :global(pre) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent !important;
+    padding: 0.95rem 1.05rem 1.05rem;
+    overflow-x: auto;
+  }
+
+  .panel :global(pre code) {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    letter-spacing: 0.008em;
+  }
+
+  .prompt-block {
+    margin: 0;
+    padding: 0.95rem 1.05rem 1.05rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: #d8e0ea;
+    white-space: pre-wrap;
+    background: transparent;
+  }
+
+  .prompt-block code {
+    font-family: inherit;
+  }
+
+  @media (max-width: 640px) {
+    .toggle-head {
+      align-items: flex-start;
+    }
+
+    .toggle-panels :global(pre),
+    .prompt-block {
+      padding: 0.9rem;
+      font-size: 0.78rem;
+    }
+  }
+</style>

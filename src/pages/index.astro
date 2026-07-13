@@ -1,0 +1,325 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroToggle from "../components/HeroToggle.astro";
+---
+
+<BaseLayout
+  title="Learner State Layer · Open Standard for Learner Context"
+  description="Learner State Layer is a compact schema for learner state: concepts, mastery, confidence, freshness, capabilities, gaps, misconceptions, and next steps."
+>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="hero-eyebrow">
+        <span class="badge badge-accent">Draft specification</span>
+        <span class="badge">Core + extensions</span>
+      </div>
+      <h1>A portable snapshot of what a person knows.</h1>
+      <p class="hero-sub">
+        LSL is an open standard for learner state. It gives AI systems, tutors, and learning
+        platforms a shared way to represent what a learner currently understands, where gaps
+        remain, and how certain those conclusions are.
+      </p>
+      <div class="hero-actions">
+        <a class="primary-action" href="/spec">Read the specification</a>
+        <a class="secondary-action" href="/examples">View examples</a>
+      </div>
+    </div>
+
+    <img
+      class="hero-diagram"
+      src="/diagram.png"
+      alt="Diagram showing LSL as a learner state snapshot rather than event logs"
+    />
+
+    <aside class="hero-panel" aria-label="Document preview">
+      <HeroToggle />
+    </aside>
+  </section>
+
+  <section class="guide-strip" aria-labelledby="guide-title">
+    <div class="section-heading guide-copy">
+      <p class="label">What to know</p>
+      <h2 id="guide-title">A compact state file, built for AI and humans alike.</h2>
+      <p>
+        It describes what a learner knows right now, and nothing more.
+      </p>
+    </div>
+
+    <div class="guide-cards">
+      <article class="info-card">
+        <p class="card-kicker">Core</p>
+        <h3>State, not events</h3>
+        <p>Current mastery, confidence, freshness, and next steps.</p>
+      </article>
+      <article class="info-card">
+        <p class="card-kicker">Reading model</p>
+        <h3>Plain-language claims</h3>
+        <p>Readable by an LLM without a lookup table.</p>
+      </article>
+      <article class="info-card">
+        <p class="card-kicker">Extensions</p>
+        <h3>Layered when needed</h3>
+        <p>Provenance, relationships, and federation stay optional.</p>
+      </article>
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <section class="cta-strip" aria-label="Next steps">
+    <div>
+      <p class="label">Next step</p>
+      <h2>Open the spec or inspect the examples.</h2>
+    </div>
+    <div class="cta-actions">
+      <a class="primary-action" href="/spec">Open the specification</a>
+      <a class="secondary-action" href="/examples">Browse examples</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr);
+    gap: 1.35rem;
+    padding: 3.25rem 0 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-copy {
+    max-width: 48rem;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .hero h1 {
+    margin: 0;
+    max-width: 12ch;
+    margin-inline: auto;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.8rem, 2rem + 3vw, 4.3rem);
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .hero-sub {
+    margin-top: 0.9rem;
+    max-width: 46rem;
+    margin-inline: auto;
+    color: var(--fg-secondary);
+    font-size: 1.07rem;
+    line-height: 1.68;
+    text-wrap: balance;
+  }
+
+  .hero-actions,
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .primary-action,
+  .secondary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.7rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+
+  .primary-action {
+    background: var(--fg);
+    border: 1px solid var(--fg);
+    color: var(--bg);
+  }
+
+  .primary-action:hover {
+    color: var(--bg);
+    opacity: 0.88;
+    text-decoration: none;
+  }
+
+  .secondary-action {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid var(--border);
+    color: var(--fg-secondary);
+  }
+
+  .secondary-action:hover {
+    color: var(--fg);
+    text-decoration: none;
+    background: var(--bg-elevated);
+    border-color: var(--border-strong);
+  }
+
+  .hero-panel {
+    display: grid;
+    gap: 1rem;
+    background:
+      linear-gradient(180deg, rgba(18, 25, 37, 0.96), rgba(18, 25, 37, 0.9));
+    border: 1px solid rgba(125, 145, 173, 0.18);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: 0 24px 50px rgba(18, 25, 37, 0.18);
+  }
+
+  .hero-diagram {
+    display: block;
+    width: 100%;
+    height: auto;
+    justify-self: stretch;
+    margin: 0;
+    border-radius: 16px;
+    border: 1px solid rgba(125, 145, 173, 0.22);
+  }
+
+  .guide-strip {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+    padding: 2.2rem 0 0;
+  }
+
+  .guide-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .guide-cards .info-card {
+    min-height: 100%;
+  }
+
+  .section-divider {
+    height: 1px;
+    margin: 2rem 0 0;
+    background: linear-gradient(90deg, transparent, rgba(31, 29, 26, 0.1), transparent);
+  }
+
+  .info-card {
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-kicker {
+    margin: 0 0 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .info-card h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .info-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .info-card p {
+    margin: 0;
+    color: var(--fg-secondary);
+    line-height: 1.6;
+  }
+
+  .section-heading {
+    max-width: 36rem;
+  }
+
+  .guide-copy p:last-child {
+    margin: 0.6rem 0 0;
+    color: var(--fg-secondary);
+    line-height: 1.65;
+  }
+
+  .cta-strip {
+    margin: 2.5rem 0 4rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cta-strip h2 {
+    margin: 0.35rem 0 0;
+  }
+
+  @media (max-width: 900px) {
+    .guide-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding-top: 2.5rem;
+    }
+
+    .hero-copy {
+      text-align: center;
+    }
+
+    .hero h1 {
+      max-width: 14ch;
+    }
+
+    .hero-panel {
+      padding: 0.85rem;
+    }
+
+    .hero-diagram {
+      width: 100%;
+    }
+
+    .cta-strip {
+      padding: 1.25rem;
+    }
+
+    .section-divider {
+      margin: 1.5rem 0 0;
+    }
+
+    .primary-action,
+    .secondary-action {
+      width: 100%;
+    }
+
+    .hero-actions,
+    .cta-actions {
+      width: 100%;
+    }
+  }
+</style>

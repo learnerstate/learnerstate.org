@@ -1,0 +1,282 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Code } from "astro:components";
+
+const rawFiles = import.meta.glob("../../content/examples-generated/*", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+
+function contentFor(name: string): string | undefined {
+  const match = Object.entries(rawFiles).find(([path]) => path.endsWith(`/${name}`));
+  return match?.[1];
+}
+
+const files = [
+  {
+    name: "minimal-core.yml",
+    lang: "yaml",
+    title: "Minimal Core",
+    description: "The smallest valid document: one concept claim, no extensions.",
+  },
+  {
+    name: "full-core-provenance.yml",
+    lang: "yaml",
+    title: "Core + Provenance",
+    description: "Multiple concepts, goals, next steps, and document-level provenance.",
+  },
+  {
+    name: "lsl-example.json",
+    lang: "json",
+    title: "JSON serialization",
+    description: "The same document as Core + Provenance, rendered as JSON.",
+  },
+  {
+    name: "federation-signed.yml",
+    lang: "yaml",
+    title: "Federation",
+    description: "An aggregated document with issuer identity, proof, and per-origin claims.",
+  },
+  {
+    name: "prompt-rendering.txt",
+    lang: "text",
+    title: "?format=prompt&budget=800",
+    description: "The prompt-form rendering used by the reader-facing format.",
+  },
+] as const;
+
+const entries = files
+  .map((f) => {
+    const content = contentFor(f.name);
+    if (content === undefined) return null;
+    return { ...f, content };
+  })
+  .filter((e): e is NonNullable<typeof e> => e !== null);
+
+if (entries.length === 0) {
+  throw new Error("Example content missing. Run `npm run fetch:spec` before building or developing.");
+}
+---
+
+<BaseLayout
+  title="Examples · Learner State Layer"
+  description="Example Learner State Layer documents in YAML, JSON, federation, and prompt format."
+>
+  <section class="examples-hero">
+    <div class="examples-copy">
+      <p class="label">Examples</p>
+      <h1>Example documents, presented clearly.</h1>
+      <p>
+        These files are pulled from the LSL repository at build time and show the main document
+        shapes the spec allows.
+      </p>
+    </div>
+
+    <div class="examples-summary">
+      <div class="summary-row">
+        <span>YAML</span>
+        <span>Canonical human-readable form</span>
+      </div>
+      <div class="summary-row">
+        <span>JSON</span>
+        <span>Same shape, machine friendly</span>
+      </div>
+      <div class="summary-row">
+        <span>Prompt</span>
+        <span>Budgeted plain-text rendering</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="examples-grid">
+    {
+      entries.map((entry) => (
+        <article class="example-card">
+          <div class="example-head">
+            <div>
+              <p class="card-kicker">{entry.name.split(".").pop()?.toUpperCase()}</p>
+              <h2>{entry.title}</h2>
+            </div>
+            <button class="copy-btn" data-copy={entry.content} type="button">Copy</button>
+          </div>
+          <p class="example-description">{entry.description}</p>
+          <div class="code-block-wrap">
+            <Code code={entry.content} lang={entry.lang} theme="github-dark" />
+          </div>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .examples-hero {
+    display: grid;
+    gap: 1rem;
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .examples-copy {
+    max-width: 42rem;
+  }
+
+  .examples-copy h1 {
+    margin: 0.35rem 0 0.8rem;
+    max-width: 12ch;
+  }
+
+  .examples-copy p:last-child {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--fg-secondary);
+    line-height: 1.7;
+  }
+
+  .examples-summary {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(31, 29, 26, 0.08);
+  }
+
+  .summary-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .summary-row span:first-child {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .summary-row span:last-child {
+    color: var(--fg);
+    text-align: right;
+  }
+
+  .examples-grid {
+    display: grid;
+    gap: 1rem;
+    padding: 2rem 0 4rem;
+  }
+
+  .example-card {
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .example-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .card-kicker {
+    margin: 0 0 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .example-head h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .example-description {
+    margin: 0 0 1rem;
+    color: var(--fg-secondary);
+    line-height: 1.65;
+  }
+
+  .code-block-wrap :global(pre) {
+    background: linear-gradient(180deg, #111823 0%, #0b1017 100%) !important;
+    border: 1px solid rgba(125, 145, 173, 0.18);
+    border-radius: 18px;
+    padding: 1.15rem 1.25rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.65;
+    box-shadow:
+      0 24px 48px rgba(8, 12, 18, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    margin: 0;
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+
+  .copy-btn:hover {
+    background: var(--hover-bg);
+    color: var(--fg);
+    border-color: var(--border-strong);
+  }
+
+  .copy-btn.copied {
+    background: #173f2f;
+    border-color: #173f2f;
+    color: #fff;
+  }
+
+  @media (min-width: 900px) {
+    .examples-hero {
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      align-items: start;
+      gap: 1.5rem;
+      padding-top: 4rem;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".copy-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const text = btn.dataset.copy;
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 1800);
+      } catch {
+        btn.textContent = "Failed";
+      }
+    });
+  });
+</script>

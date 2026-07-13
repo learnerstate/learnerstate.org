@@ -1,0 +1,74 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+const { href, title, description, icon } = Astro.props;
+---
+
+<a class="link-card" href={href}>
+  <div class="card-header">
+    <span class="card-icon" aria-hidden="true">{icon}</span>
+    <span class="card-title">{title}</span>
+    <span class="card-arrow" aria-hidden="true">→</span>
+  </div>
+  <p>{description}</p>
+</a>
+
+<style>
+  .link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-icon {
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 0.975rem;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+    flex: 1;
+  }
+
+  .card-arrow {
+    font-size: 1rem;
+    color: var(--muted);
+    transition: transform 200ms ease, color 200ms ease;
+    flex-shrink: 0;
+  }
+
+  .link-card:hover .card-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  .link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .link-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+</style>
