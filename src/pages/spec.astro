@@ -33,7 +33,7 @@ const fetchedDate = specEntry.data.fetchedAt
     <section class="spec-hero">
       <div class="spec-copy">
         <p class="label">Specification</p>
-        <h1>Portable learner state, defined clearly.</h1>
+        <h1>Portable learner state.</h1>
         <p class="spec-lead">
           LSL is a compact, portable snapshot of what a learner knows now, what they still need to
           work on, and how confident each claim is.
@@ -133,12 +133,11 @@ const fetchedDate = specEntry.data.fetchedAt
 
   .spec-summary {
     display: grid;
-    gap: 0.8rem;
-    padding: 1.2rem;
+    gap: 0.55rem;
+    padding: 0.95rem 1.05rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.7);
   }
 
   .summary-row {
@@ -146,7 +145,7 @@ const fetchedDate = specEntry.data.fetchedAt
     align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
-    padding-top: 0.8rem;
+    padding-top: 0.55rem;
     border-top: 1px solid rgba(31, 29, 26, 0.08);
   }
 
@@ -156,7 +155,7 @@ const fetchedDate = specEntry.data.fetchedAt
   }
 
   .summary-key {
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -166,6 +165,7 @@ const fetchedDate = specEntry.data.fetchedAt
 
   .summary-value {
     color: var(--fg);
+    font-size: 0.85rem;
     text-align: right;
   }
 

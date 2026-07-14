@@ -18,6 +18,7 @@ const root = path.resolve(__dirname, "..");
 const SPEC_OUT_DIR = path.join(root, "src/content/spec-generated");
 const INTRO_OUT_DIR = path.join(root, "src/content/intro-generated");
 const EXAMPLES_OUT_DIR = path.join(root, "src/content/examples-generated");
+const SCHEMA_OUT_DIR = path.join(root, "public/schema/v1");
 
 const LSL_REF = process.env.LSL_REF ?? "main";
 const REMOTE_BASE = `https://raw.githubusercontent.com/learnerstate/lsl/${LSL_REF}`;
@@ -34,6 +35,7 @@ const FILES = {
     "examples/federation-signed.yml",
     "examples/prompt-rendering.txt",
   ],
+  schema: "schema/lsl-core.schema.json",
 };
 
 async function getContent(relPath) {
@@ -65,9 +67,11 @@ async function main() {
   await rm(SPEC_OUT_DIR, { recursive: true, force: true });
   await rm(INTRO_OUT_DIR, { recursive: true, force: true });
   await rm(EXAMPLES_OUT_DIR, { recursive: true, force: true });
+  await rm(SCHEMA_OUT_DIR, { recursive: true, force: true });
   await mkdir(SPEC_OUT_DIR, { recursive: true });
   await mkdir(INTRO_OUT_DIR, { recursive: true });
   await mkdir(EXAMPLES_OUT_DIR, { recursive: true });
+  await mkdir(SCHEMA_OUT_DIR, { recursive: true });
   const fetchedAt = new Date().toISOString();
 
   // --- README.md -> intro content-collection entry with generated frontmatter ---
@@ -91,6 +95,12 @@ async function main() {
     await writeFile(path.join(EXAMPLES_OUT_DIR, outName), content, "utf-8");
     console.log(`[fetch-spec] wrote ${outName} (${content.length} bytes)`);
   }
+
+  // --- schema -> public/schema/v1/, served at the URL its own $id declares ---
+  const schemaRaw = await getContent(FILES.schema);
+  const schemaOutName = path.basename(FILES.schema);
+  await writeFile(path.join(SCHEMA_OUT_DIR, schemaOutName), schemaRaw, "utf-8");
+  console.log(`[fetch-spec] wrote ${schemaOutName} (${schemaRaw.length} bytes)`);
 
   console.log("[fetch-spec] done.");
 }

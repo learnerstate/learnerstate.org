@@ -38,8 +38,11 @@ manual look are the bar.
 
 ## Design system
 
-The site follows a strict typographic neo-brutalism design system (see
-`src/styles/global.css`): pure black/white, one accent color, zero
-border-radius, zero box-shadow. If your change adds a shadow, a gradient, a
-rounded corner, or a second accent color, it'll get bounced — please match
-the existing tokens instead of adding new ones.
+The site follows a neutral-paper design system (see `src/styles/global.css`):
+warm off-white background (`--bg`), near-black text, a single restrained blue
+accent (`--accent` and its `-hover`/`-subtle` variants), soft shadow tokens
+(`--shadow-sm` through `--shadow-lg`), and small-to-medium border radii
+(`--radius-sm` through `--radius-lg`). Serif display type (Fraunces) pairs
+with Inter for body text and Geist Mono for labels/code. If your change
+introduces a new color, shadow, or radius value, use or extend the existing
+tokens instead of hardcoding new ones.

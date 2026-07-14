@@ -26,6 +26,9 @@ repo:
   content collection and rendered by `src/pages/spec.astro`.
 - `examples/*` → `src/content/examples-generated/`, rendered by
   `src/pages/examples/index.astro`.
+- `schema/lsl-core.schema.json` → `public/schema/v1/lsl-core.schema.json`,
+  served as a static file at `/schema/v1/lsl-core.schema.json` — the same
+  URL the schema's own `$id` declares, so it resolves.
 
 Two source modes, resolved in this order:
 
