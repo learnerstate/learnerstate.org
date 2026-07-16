@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { excerptFrom, readingMinutes } from "../../../lib/text";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blogs");
@@ -12,18 +13,58 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+const body = post.body ?? "";
+const description = excerptFrom(body, 155) || `${post.data.title} — a blog post from the Learner State community.`;
+const minutes = readingMinutes(body);
+
+const authorMatch = body.match(/Written by \[([^\]]+)\]\(([^)]+)\)/);
+const author = authorMatch ? { name: authorMatch[1], url: authorMatch[2] } : null;
+
+const publishedDate = new Date(post.data.date);
+const updatedDate = new Date(post.data.updatedAt);
+const formatDate = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+const wasUpdated = formatDate(updatedDate) !== formatDate(publishedDate);
+
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const blogPostingSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description,
+  url: pageUrl,
+  datePublished: post.data.date,
+  dateModified: post.data.updatedAt,
+  ...(author && { author: { "@type": "Person", name: author.name, url: author.url } }),
+  publisher: {
+    "@type": "Organization",
+    name: "Learner State Layer",
+    url: "https://learnerstate.org",
+  },
+  mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+};
 ---
 
 <BaseLayout
   title={`${post.data.title} · Resources · Learner State Layer`}
-  description={`${post.data.title} — a blog post from the Learner State community.`}
+  description={description}
   bodyClass="blog-post-page"
   ogType="article"
+  publishedTime={post.data.date}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)} />
   <section class="blog-post-rendering">
     <article class="prose blog-post-content">
       <div class="blog-post-content-head">
-        <p class="label">Resources / Blogs</p>
+        <div class="blog-post-meta">
+          <p class="label">Resources / Blogs</p>
+          <p class="blog-post-dates">
+            {formatDate(publishedDate)}
+            {wasUpdated && <> · Updated {formatDate(updatedDate)}</>}
+            {" · "}{minutes} min read
+          </p>
+        </div>
         <a
           class="src-link"
           href={`https://github.com/learnerstate/Resources/blob/main/blogs/${post.data.slug}.md`}
@@ -53,10 +94,23 @@ const { Content } = await render(post);
 
   .blog-post-content-head {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1.5rem;
+  }
+
+  .blog-post-meta {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .blog-post-dates {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
   }
 
   .src-link {

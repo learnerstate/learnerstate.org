@@ -32,6 +32,8 @@ const blogs = defineCollection({
     slug: z.string(),
     source: z.string(),
     fetchedAt: z.string(),
+    date: z.string(),
+    updatedAt: z.string(),
   }),
 });
 

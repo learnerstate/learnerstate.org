@@ -4,16 +4,23 @@ interface Props {
   title: string;
   excerpt: string;
   minutes: number;
+  date: string;
 }
 
-const { href, title, excerpt, minutes } = Astro.props;
+const { href, title, excerpt, minutes, date } = Astro.props;
+const formattedDate = new Date(date).toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
 ---
 
 <a class="blog-row" href={href}>
   <div class="blog-row-text">
     <h2 class="blog-row-title">{title}</h2>
     {excerpt && <p class="blog-row-excerpt">{excerpt}</p>}
-    <span class="blog-row-meta">{minutes} min read</span>
+    <span class="blog-row-meta">{formattedDate} · {minutes} min read</span>
   </div>
   <span class="blog-row-arrow" aria-hidden="true">→</span>
 </a>

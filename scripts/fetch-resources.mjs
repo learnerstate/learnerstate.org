@@ -11,6 +11,7 @@
 //      "main"). Used in CI / production builds.
 
 import { mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -23,6 +24,7 @@ const RESOURCES_REF = process.env.RESOURCES_REF ?? "main";
 const RESOURCES_REPO = "learnerstate/Resources";
 const RAW_BASE = `https://raw.githubusercontent.com/${RESOURCES_REPO}/${RESOURCES_REF}`;
 const API_BASE = `https://api.github.com/repos/${RESOURCES_REPO}/contents`;
+const COMMITS_API = `https://api.github.com/repos/${RESOURCES_REPO}/commits`;
 const LOCAL_PATH = process.env.RESOURCES_LOCAL_PATH ?? null;
 
 async function listLocalBlogFiles() {
@@ -42,6 +44,40 @@ async function listRemoteBlogFiles() {
   return entries
     .filter((entry) => entry.type === "file" && entry.name.endsWith(".md"))
     .map((entry) => entry.name);
+}
+
+function getLocalDates(relPath) {
+  try {
+    const output = execFileSync(
+      "git",
+      ["-C", LOCAL_PATH, "log", "--follow", "--format=%aI", "--", relPath],
+      { encoding: "utf-8" },
+    ).trim();
+    const dates = output.split("\n").filter(Boolean);
+    if (dates.length === 0) return { publishedAt: null, updatedAt: null };
+    return { publishedAt: dates[dates.length - 1], updatedAt: dates[0] };
+  } catch {
+    return { publishedAt: null, updatedAt: null };
+  }
+}
+
+async function getRemoteDates(relPath) {
+  const res = await fetch(`${COMMITS_API}?path=${encodeURIComponent(relPath)}&ref=${RESOURCES_REF}`, {
+    headers: { Accept: "application/vnd.github+json" },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch commit history for ${relPath}: ${res.status} ${res.statusText}`);
+  }
+  const commits = await res.json();
+  if (commits.length === 0) return { publishedAt: null, updatedAt: null };
+  return {
+    publishedAt: commits[commits.length - 1].commit.author.date,
+    updatedAt: commits[0].commit.author.date,
+  };
+}
+
+async function getDates(relPath) {
+  return LOCAL_PATH ? getLocalDates(relPath) : getRemoteDates(relPath);
 }
 
 async function getContent(relPath) {
@@ -91,10 +127,20 @@ async function main() {
   const filenames = LOCAL_PATH ? await listLocalBlogFiles() : await listRemoteBlogFiles();
 
   for (const filename of filenames) {
-    const raw = await getContent(`blogs/${filename}`);
+    const relPath = `blogs/${filename}`;
+    const raw = await getContent(relPath);
     const slug = slugify(filename);
     const title = titleFromContent(raw, slug);
-    const doc = frontmatter({ title, slug, source, fetchedAt }) + raw;
+    const { publishedAt, updatedAt } = await getDates(relPath);
+    const doc =
+      frontmatter({
+        title,
+        slug,
+        source,
+        fetchedAt,
+        date: publishedAt ?? fetchedAt,
+        updatedAt: updatedAt ?? publishedAt ?? fetchedAt,
+      }) + raw;
     await writeFile(path.join(BLOGS_OUT_DIR, filename), doc, "utf-8");
     console.log(`[fetch-resources] wrote ${filename} (${raw.length} bytes)`);
   }

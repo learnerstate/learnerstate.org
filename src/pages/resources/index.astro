@@ -11,8 +11,9 @@ const posts = (await getCollection("blogs"))
     title: post.data.title,
     excerpt: excerptFrom(post.body ?? ""),
     minutes: readingMinutes(post.body ?? ""),
+    date: post.data.date,
   }))
-  .sort((a, b) => a.title.localeCompare(b.title));
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 ---
 
 <BaseLayout
