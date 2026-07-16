@@ -1,0 +1,66 @@
+---
+import { resourceCategories } from "../lib/resource-categories";
+
+interface Props {
+  active: string;
+}
+
+const { active } = Astro.props;
+---
+
+<nav class="resources-nav" aria-label="Resource categories">
+  <ul class="resources-nav-list">
+    {
+      resourceCategories.map((category) => (
+        <li>
+          <a
+            href={category.href}
+            class:list={[{ active: category.key === active }]}
+            aria-current={category.key === active ? "page" : undefined}
+          >
+            {category.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .resources-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .resources-nav-list a {
+    display: block;
+    padding: 0.5em 0.75em;
+    border-radius: 10px;
+    color: var(--fg-secondary);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .resources-nav-list a:hover {
+    background: var(--hover-bg);
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .resources-nav-list a.active {
+    background: var(--accent-subtle);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  @media (max-width: 899px) {
+    .resources-nav-list {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, auto);
+    }
+  }
+</style>

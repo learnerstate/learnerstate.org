@@ -3,6 +3,7 @@ const navItems = [
   { href: "/intro", label: "Intro" },
   { href: "/spec", label: "Spec" },
   { href: "/examples", label: "Examples" },
+  { href: "/resources", label: "Resources" },
 ];
 const currentPath = Astro.url.pathname;
 
@@ -13,6 +14,8 @@ if (currentPath.startsWith("/intro")) {
   pageName = "Spec";
 } else if (currentPath.startsWith("/examples")) {
   pageName = "Examples";
+} else if (currentPath.startsWith("/resources")) {
+  pageName = "Resources";
 }
 ---
 

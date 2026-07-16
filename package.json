@@ -7,9 +7,10 @@
   },
   "scripts": {
     "fetch:spec": "node scripts/fetch-spec.mjs",
-    "predev": "npm run fetch:spec",
+    "fetch:resources": "node scripts/fetch-resources.mjs",
+    "predev": "npm run fetch:spec && npm run fetch:resources",
     "dev": "astro dev",
-    "prebuild": "npm run fetch:spec",
+    "prebuild": "npm run fetch:spec && npm run fetch:resources",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

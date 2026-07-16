@@ -1,0 +1,78 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  excerpt: string;
+  minutes: number;
+}
+
+const { href, title, excerpt, minutes } = Astro.props;
+---
+
+<a class="blog-row" href={href}>
+  <div class="blog-row-text">
+    <h2 class="blog-row-title">{title}</h2>
+    {excerpt && <p class="blog-row-excerpt">{excerpt}</p>}
+    <span class="blog-row-meta">{minutes} min read</span>
+  </div>
+  <span class="blog-row-arrow" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .blog-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+  }
+
+  .blog-row:first-child {
+    padding-top: 0;
+  }
+
+  .blog-row-text {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .blog-row-title {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.35;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+
+  .blog-row:hover .blog-row-title {
+    color: var(--accent);
+  }
+
+  .blog-row-excerpt {
+    margin: 0;
+    color: var(--fg-secondary);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .blog-row-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .blog-row-arrow {
+    flex-shrink: 0;
+    margin-top: 0.3rem;
+    color: var(--muted);
+    transition: transform 200ms ease, color 200ms ease;
+  }
+
+  .blog-row:hover .blog-row-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+</style>

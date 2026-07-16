@@ -23,4 +23,16 @@ const spec = defineCollection({
   }),
 });
 
-export const collections = { intro, spec };
+// Populated at build time by scripts/fetch-resources.mjs and gitignored.
+// See README.md for the build-time content pull.
+const blogs = defineCollection({
+  loader: glob({ pattern: "*.md", base: "./src/content/blogs-generated" }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    source: z.string(),
+    fetchedAt: z.string(),
+  }),
+});
+
+export const collections = { intro, spec, blogs };

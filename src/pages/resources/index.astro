@@ -1,0 +1,103 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ResourcesSidebar from "../../components/ResourcesSidebar.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import { getCollection } from "astro:content";
+import { excerptFrom, readingMinutes } from "../../lib/text";
+
+const posts = (await getCollection("blogs"))
+  .map((post) => ({
+    href: `/resources/blogs/${post.data.slug}`,
+    title: post.data.title,
+    excerpt: excerptFrom(post.body ?? ""),
+    minutes: readingMinutes(post.body ?? ""),
+  }))
+  .sort((a, b) => a.title.localeCompare(b.title));
+---
+
+<BaseLayout
+  title="Resources · Learner State Layer"
+  description="Blogs, articles, and other resources from the Learner State community."
+  bodyClass="resources-page"
+>
+  <div class="resources-intro">
+    <section class="resources-hero">
+      <div class="resources-copy">
+        <p class="label">Resources</p>
+        <h1>Blogs, articles, and other resources from the Learner State community.</h1>
+      </div>
+    </section>
+  </div>
+
+  <section class="resources-shell">
+    <aside class="resources-sidebar">
+      <ResourcesSidebar active="blogs" />
+    </aside>
+
+    <div class="resources-content">
+      {
+        posts.length === 0 ? (
+          <p class="empty">No posts yet.</p>
+        ) : (
+          posts.map((post) => <BlogCard {...post} />)
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .resources-intro {
+    width: min(68rem, calc(100vw - 3rem));
+    margin-inline: auto;
+  }
+
+  .resources-hero {
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .resources-copy {
+    max-width: 44rem;
+  }
+
+  .resources-copy h1 {
+    margin-top: 0.35rem;
+    margin-bottom: 0;
+    max-width: 40ch;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+    color: var(--fg-secondary);
+  }
+
+  .resources-shell {
+    display: grid;
+    gap: 1.5rem;
+    width: min(76rem, calc(100vw - 3rem));
+    margin-inline: auto;
+    padding: 2rem 0 4.5rem;
+  }
+
+  .empty {
+    color: var(--muted);
+  }
+
+  @media (min-width: 900px) {
+    .resources-hero {
+      padding-top: 4rem;
+    }
+
+    .resources-shell {
+      grid-template-columns: 220px minmax(0, 1fr);
+      align-items: start;
+      gap: 2.25rem;
+    }
+
+    .resources-sidebar {
+      position: sticky;
+      top: calc(3.5rem + 1rem);
+    }
+  }
+</style>

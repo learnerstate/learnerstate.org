@@ -10,6 +10,10 @@ src/content/intro-generated/
 src/content/examples-generated/
 public/schema/
 
+# content pulled from the learnerstate/Resources repo at build time — see
+# scripts/fetch-resources.mjs and README.md
+src/content/blogs-generated/
+
 # dependencies
 node_modules/
 
