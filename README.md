@@ -80,11 +80,7 @@ and the cross-repo PAT/secret when ready to automate it.)
   build-time-generated spec (`src/content/spec-generated/`).
 - **Shiki** (Astro's built-in markdown highlighter) for code, theme
   `github-light`.
-- Design system: clean and Notion-like, light theme only (no
-  `prefers-color-scheme` dark mode). Tokens live in `src/styles/global.css` —
-  white background, near-black text, thin light-gray borders, small radius,
-  one accent (`#1D4ED8`), subtle gray hover states, mono-as-label for dates
-  and section labels.
+
 
 ## Local dev
 
